@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>youtube data api</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="alert alert-danger text-center mt-3 fw-bold fs-3" role="alert">
+        Youtube Open API
+      </div>
+      <div class="row justify-content-md-center">
+        <div class="col-auto">
+          <label for="query" class="visually-hidden">검색어</label>
+          <input type="text" class="form-control" id="query" placeholder="검색 할 단어..." />
+        </div>
+        <div class="col-auto">
+          <button type="button" id="btn-search" class="btn btn-primary mb-3">검색</button>
+        </div>
+      </div>
+      <div id="videoView"></div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      let serviceKey = "AIzaSyDKORc80BctK6U3twnwc10pDB8MfuLujiw";
+      let baseUrl = "https://youtube.googleapis.com/youtube/v3/search";
+      document.querySelector("#btn-search").addEventListener("click", function () {
+        let keyword = document.querySelector("#query").value;
+        let queryString = `part=snippet&maxResults=5&q=${keyword}&type=video&key=${serviceKey}`;
+        let url = baseUrl + "?" + queryString;
+        fetch(url)
+          .then((response) => response.json())
+          .then((data) => makeList(data));
+      });
+
+      function makeList(data) {
+        // console.log(data);
+        let videos = ``;
+        data.items.forEach((item) => {
+          videos += `            
+      <div class="row mb-3">
+        <div class="col-auto justify-content-center p-3">
+          <iframe id="ytplayer" type="text/html" width="550" height="350"
+            src="https://www.youtube.com/embed/${item.id.videoId}"
+            frameborder="0" allowfullscreen></iframe>
+        </div>
+        <div class="col-lg-6 pt-5 ps-3">
+          <h2 class="mb-3">${item.snippet.title}</h2>
+          <p class="text-break fs-5 p-3">${item.snippet.description}</p>
+          <div class="text-end"><small class="text-body-secondary">${item.snippet.publishTime}</small></div>
+        </div>
+      </div>
+    `;
+        });
+        document.querySelector("#videoView").innerHTML = videos;
+      }
+    </script>
+  </body>
+</html>
